@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const User = require('./models/user'); // модель користувача
 const UserRepository = require('./repositories/user-repository'); // репозиторій користувача
 
-const application = require('./index');
+const application = require('./server');
 
 
 
