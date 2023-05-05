@@ -4,10 +4,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const User = require('./models/user'); // модель користувача
 const UserRepository = require('./repositories/user-repository'); // репозиторій користувача
-
-const application = require('./server');
-
-
+require('./server');
 
 const app = express();
 const userRepository = new UserRepository();
