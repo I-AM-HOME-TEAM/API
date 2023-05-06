@@ -33,7 +33,7 @@ app.post('/register', [
     // хешування пароля перед збереженням в БД
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User(email, hashedPassword);
+    await User.create({ email: email, password: hashedPassword });
     await userRepository.save(newUser);
 
     return res.status(201).json({ message: 'Користувач успішно зареєстрований' });
