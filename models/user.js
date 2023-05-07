@@ -1,5 +1,11 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../database');
+const UserSettings = require('./userSettings');
+const Roles = require('./roles');
+const Notifications = require('./notifications');
+const DeviceSettings = require('./deviceSettings');
+const IpAddresses = require('./ipAddresses');
+const Device = require('./device');
 
 const User = sequelize.define('User', {
             id: {
@@ -9,6 +15,11 @@ const User = sequelize.define('User', {
             },
             role_id: {
                 type: DataTypes.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'roles',
+                    key: 'id',
+                }
             },
             name: {
                 type: DataTypes.STRING,
@@ -41,5 +52,14 @@ const User = sequelize.define('User', {
             tableName: 'users',
         }
     );
+
+User.associate = function(models) {
+    User.hasOne(models.UserSettings, { foreignKey: 'user_id',  onDelete: 'CASCADE'});
+    User.hasMany(models.Notifications, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+    User.hasMany(models.DeviceSettings, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+    User.belongsTo(models.Roles, { foreignKey: 'role_id', onDelete: 'CASCADE' });
+    User.hasMany(models.IpAddresses, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+    User.hasMany(models.Device, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+};
 
 module.exports = User;

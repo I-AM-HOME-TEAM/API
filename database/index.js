@@ -10,12 +10,11 @@ const sequelize = new Sequelize(
     }
 );
 
-sequelize.sync();
-
 (async () => {
     try {
         await sequelize.authenticate();
         console.log("Connected successfully");
+        await sequelize.sync();
     }catch (error){
         console.error("Unable to connect to the database", error)
     }

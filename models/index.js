@@ -37,7 +37,7 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
-
+const db = require('./models');
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
