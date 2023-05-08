@@ -3,17 +3,17 @@ const User = require('../models/user');
 
 const router = express.Router();
 
-//Ендпоінт для реєстрації
+// Registration endpoint
 router.post('/register', async (req, res) => {
 
     const { name, email, password } = req.body;
 
-    //Перевірка чи пароль містить мінімум 8 символів
+    // Check if password is 8 symbols long
     if (password.length < 8) {
         return res.status(400).json({ error: "Password should be at least 8 characters long" });
     }
 
-    //Перевірка чи користувач вже зареєстрований
+    // Check if user already exists
     const userAlreadyExists = await User.findOne({ where: { email } }).catch((err) => {
         console.log("Error: ", err);
     });
@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ message: "User with this email already exists"});
     }
 
-    //Внесення даних в БД
+    // Insert info to DB
     const newUser = new User({ name, email, password });
     const savedUser = await newUser.save().catch((err) => {
         console.log("Error: ", err);

@@ -5,21 +5,21 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-//Ендпоінт для авторизації
+// Authorisation endpoint
 router.post("/login", async (req, res) => {
 
     const { email, password } = req.body;
 
-    //Перевірка чи існує користувач з таким email
+    // Check if email already exists
     const userWithEmail = await User.findOne({ where: { email } }).catch((err) => {
         console.log("Error: ", err);
     });
 
-    //Якщо ні - помилка
+    // If exists - error
     if(!userWithEmail)
         return res.status(400).json({ message: "Email or password does not match..." });
 
-    //Якщо пароль не відповідє запису в базі - помилка
+    // If password is incorrect - error
     if(userWithEmail.password !== password)
         return res.status(400).json({ message: "Email or password does not match..." });
 

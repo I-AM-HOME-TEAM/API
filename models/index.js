@@ -27,18 +27,35 @@ fs
       file.indexOf('.test.js') === -1
     );
   })
-  .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
-  });
+  // .forEach(file => {
+  //   const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+  //   db[model.name] = model;
+  // });
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
-const db = require('./models');
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+// Import database tables (for CRUD)
+db.users = require('./user'); // db.tableName
+db.user_settings = require('./userSettings');
+db.devices = require('./device');
+db.device_settings = require('./deviceSettings');
+db.roles = require('./roles');
+db.temperatures = require('./temperature');
+db.humidities = require('./humidity');
+db.ip_ddresses = require('./ipAddresses');
+db.notifications = require('./notifications');
+db.open_ai_logs = require('./openAiLogs');
+
+db.sequelize.sync({ force: false })
+    .then(() => {
+      console.log('Re-sync done');
+    });
 
 module.exports = db;
