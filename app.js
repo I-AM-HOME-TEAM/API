@@ -1,77 +1,75 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const { check, validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
-const User = require('./models/user'); // модель користувача
-const UserRepository = require('./repositories/user-repository'); // репозиторій користувача
-require('./server');
+const bodyParser = require("body-parser");
+
+require("dotenv").config();
+
+require('./models/user');
+
+const middlewares = require('./middlewares');
+const api = require ('./api');
+const express = require("express");
 
 const app = express();
-const userRepository = new UserRepository();
 
-// middleware для розбору JSON з тіла запиту
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+// Routers
+    // User router
+const userRouter = require('./routes/userRouter');
+app.use("/api/v1/users", userRouter);
+
+    // UserSettings router
+const userSettingsRouter = require('./routes/userSettingsRouter');
+app.use("/api/v1/userSettings", userSettingsRouter);
+
+    // Device router
+const devicesRouter = require('./routes/devicesRouter');
+app.use("/api/v1/devices", devicesRouter);
+
+    // DeviceSettings router
+const deviceSettingsRouter = require('./routes/deviceSettingsRouter');
+app.use("/api/v1/deviceSettings", deviceSettingsRouter);
+
+    // Roles router
+const rolesRouter = require('./routes/rolesRouter');
+app.use("/api/v1/roles", rolesRouter);
+
+    // Temperature router
+const temperatureRouter = require('./routes/temperatureRouter');
+app.use("/api/v1/temperature", temperatureRouter);
+
+    // Humidity router
+const humidityRouter = require('./routes/humidityRouter');
+app.use("/api/v1/humidity", humidityRouter);
+
+    // IP Address router
+const ipAddressRouter = require('./routes/ipAddressRouter');
+app.use("/api/v1/ipaddress", ipAddressRouter);
+
+    // Notification router
+const notificationRouter = require('./routes/notificationRouter');
+app.use("/api/v1/notification", notificationRouter);
+
+    // Open AI Logs router
+const openAiLogsRouter = require('./routes/openAiLogsRouter');
+app.use("/api/v1/openailogs", openAiLogsRouter);
+
+    // Main route
+app.use("/api/v1", api);
+
+
 app.use(express.json());
 
-// ендпоінт для реєстрації
-app.post('/register', [
-    check('email').isEmail(),
-    check('password').isLength({ min: 8 }),
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password } = req.body;
-
-    // перевірка, чи користувач з таким email вже зареєстрований
-    const existingUser = await userRepository.findByEmail(email);
-    if (existingUser) {
-        return res.status(409).json({ message: 'Користувач з таким email уже існує' });
-    }
-
-    // хешування пароля перед збереженням в БД
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await User.create({ email: email, password: hashedPassword });
-    await userRepository.save(newUser);
-
-    return res.status(201).json({ message: 'Користувач успішно зареєстрований' });
-});
-
-// ендпоінт для авторизації
-app.post('/login', [
-    check('email').isEmail(),
-    check('password').isLength({ min: 8 }),
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password } = req.body;
-
-    // пошук користувача за email
-    const user = await userRepository.findByEmail(email);
-    if (!user) {
-        return res.status(401).json({ message: 'Неправильні дані для входу' });
-    }
-
-    // перевірка, чи пароль збігається
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-        return res.status(401).json({ message: 'Неправильні дані для входу' });
-    }
-
-    const token = jwt.sign({ userId: user.id }, 'secret_key', { expiresIn: '1h' });
-
-    // повертаємо відповідь з токеном
-    res.status(200).json({
-        message: 'Авторизація пройшла успішно',
-        token: token,
-        expiresIn: 3600 // кількість секунд до закінчення токена
-    });
-    app.listen(3000, () => {
-        console.log('Server started on port 3000 - app.js');
+app.get("/", (req, res) => {
+    res.json({
+        message: "App.js"
     });
 });
+
+
+
+
+// app.use(middlewares.notFound);
+// app.use(middlewares.errorHandler);
+
+module.exports = app;
