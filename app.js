@@ -7,8 +7,34 @@ require('./models/user');
 const middlewares = require('./middlewares');
 const api = require ('./api');
 const express = require("express");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
+
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'SweeMe - API',
+            version: '1.0.0',
+            description: 'API documentation for SweeMe project'
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000',
+                description: 'Development server'
+            },
+            {
+                url: 'https://sweeme.com.ua',
+                description: 'Production server'
+            }
+        ]
+    },
+    apis: ['./routes/userRouter.js', './routes/userSettingsRouter.js', './routes/devicesRouter.js', './routes/deviceSettingsRouter.js', './routes/rolesRouter.js', './routes/temperatureRouter.js', './routes/humidityRouter.js', './routes/ipAddressRouter.js', './routes/notificationRouter.js', './routes/openAiLogsRouter.js']
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -56,6 +82,9 @@ app.use("/api/v1/openailogs", openAiLogsRouter);
 
     // Main route
 app.use("/api/v1", api);
+
+    // Swagger route
+app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 app.use(express.json());
