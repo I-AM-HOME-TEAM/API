@@ -7,8 +7,9 @@ const addDevice = async (req, res) => {
     let info = {
         user_id: req.body.user_id,
         name: req.body.name,
-        type: req.type
+        type: req.body.type
     }
+    console.log(info);
 
     const devices = await Devices.create(info);
 

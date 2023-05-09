@@ -24,7 +24,7 @@ const Device = sequelize.define('Device', {
         allowNull: false,
     },
     type: {
-        type: DataTypes.ENUM(''),
+        type: DataTypes.ENUM('1', '2'),
         allowNull: false,
     },
     created_at: {
