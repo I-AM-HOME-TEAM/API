@@ -12,28 +12,42 @@ const api = require ('./api');
 const app = express();
 
 const swaggerOptions = {
-    swaggerDefinition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'SweeMe - API',
-            version: '1.0.0',
-            description: 'API documentation for SweeMe project'
-        },
-        servers: [
-            {
-                url: 'http://localhost:3000',
-                description: 'Development server'
-            },
-            {
-                url: 'https://sweeme.com.ua',
-                description: 'Production server'
-            }
-        ]
+    openapi: '3.0.0',
+    info: {
+        title: 'SweeMe - API',
+        version: '1.0.0',
+        description: 'API documentation for SweeMe project'
     },
-    apis: ['./routes/userRouter.js', './routes/userSettingsRouter.js', './routes/devicesRouter.js', './routes/deviceSettingsRouter.js', './routes/rolesRouter.js', './routes/temperatureRouter.js', './routes/humidityRouter.js', './routes/ipAddressRouter.js', './routes/notificationRouter.js', './routes/openAiLogsRouter.js']
+    components: {
+        securitySchemes: {
+            BearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT'
+            }
+        }
+    },
+    security: [
+        {
+            BearerAuth: []
+        }
+    ],
+    servers: [
+        {
+            url: 'http://localhost:3000',
+            description: 'Development server'
+        },
+        {
+            url: 'https://sweeme.com.ua',
+            description: 'Production server'
+        }
+    ],
 };
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
+const swaggerDocs = swaggerJsdoc({
+    swaggerDefinition: swaggerOptions,
+    apis: ['./routes/userRouter.js', './routes/userSettingsRouter.js', './routes/devicesRouter.js', './routes/deviceSettingsRouter.js', './routes/rolesRouter.js', './routes/temperatureRouter.js', './routes/humidityRouter.js', './routes/ipAddressRouter.js', './routes/notificationRouter.js', './routes/openAiLogsRouter.js']
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
