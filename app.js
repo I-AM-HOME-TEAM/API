@@ -1,15 +1,14 @@
 const bodyParser = require("body-parser");
-
+const express = require("express");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 require("dotenv").config();
+require("./auth/passport");
 
 require('./models/user');
 
 const middlewares = require('./middlewares');
 const api = require ('./api');
-const express = require("express");
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-
 const app = express();
 
 const swaggerOptions = {
