@@ -163,8 +163,6 @@ userRouter.post('/add', passport.authenticate("jwt", { session: false }), userCo
 
 userRouter.get('/getAll', passport.authenticate("jwt", { session: false }), userController.getAllUsers);
 
-
-
 userRouter.get('/:id', passport.authenticate("jwt", { session: false }), userController.getOneUser);
 
 userRouter.put('/:id', passport.authenticate("jwt", { session: false }), userController.updateUser);

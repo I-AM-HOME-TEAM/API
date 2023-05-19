@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": null,
-    "database": "nodedb",
+    "password": "password",
+    "database": "sweeme",
     "host": "localhost",
     "dialect": "mysql"
   },
