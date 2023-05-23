@@ -156,19 +156,17 @@
  */
 
 const userController = require('../controllers/userController');
-
+const passport = require("passport");
 const userRouter = require('express').Router();
 
-userRouter.post('/add', userController.addUser);
+userRouter.post('/add', passport.authenticate("jwt", { session: false }), userController.addUser);
 
-userRouter.get('/getAll', userController.getAllUsers);
+userRouter.get('/getAll', passport.authenticate("jwt", { session: false }), userController.getAllUsers);
 
+userRouter.get('/:id', passport.authenticate("jwt", { session: false }), userController.getOneUser);
 
+userRouter.put('/:id', passport.authenticate("jwt", { session: false }), userController.updateUser);
 
-userRouter.get('/:id', userController.getOneUser);
-
-userRouter.put('/:id', userController.updateUser);
-
-userRouter.delete('/:id', userController.deleteUser);
+userRouter.delete('/:id', passport.authenticate("jwt", { session: false }), userController.deleteUser);
 
 module.exports = userRouter;
