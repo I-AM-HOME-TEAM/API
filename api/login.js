@@ -1,34 +1,43 @@
 const express = require('express');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
-// Authorisation endpoint
+// Authorization endpoint
 router.post("/login", async (req, res) => {
-
     const { email, password } = req.body;
 
-    // Check if email already exists
-    const userWithEmail = await User.findOne({ where: { email } }).catch((err) => {
-        console.log("Error: ", err);
-    });
+    try {
+        // Check if email already exists
+        const userWithEmail = await User.findOne({ where: { email } });
 
-    // If exists - error
-    if(!userWithEmail)
-        return res.status(400).json({ message: "Email or password does not match..." });
+        if (!userWithEmail) {
+            return res.status(400).json({ message: "Email or password does not match..." });
+        }
 
-    // If password is incorrect - error
-    if(userWithEmail.password !== password)
-        return res.status(400).json({ message: "Email or password does not match..." });
+        // Compare passwords using bcrypt
+        const isPasswordMatch = await bcrypt.compare(password, userWithEmail.password);
 
-    const jwtToken = jwt.sign({
-        id: userWithEmail.id,
-        email: userWithEmail.email,
-    }, process.env.JWT_SECRET);
+        if (!isPasswordMatch) {
+            return res.status(400).json({ message: "Email or password does not match..." });
+        }
 
-    res.status(200).json({ message: "You logged in!", token: jwtToken});
+        // Generate JWT token
+        const jwtToken = jwt.sign(
+            {
+                id: userWithEmail.id,
+                email: userWithEmail.email,
+            },
+            process.env.JWT_SECRET
+        );
+
+        res.status(200).json({ message: "You logged in!", token: jwtToken });
+    } catch (error) {
+        console.log("Error: ", error);
+        res.status(500).json({ message: "An error occurred during login" });
+    }
 });
 
 router.get('/decode-jwt', (req, res) => {
