@@ -31,4 +31,40 @@ router.post("/login", async (req, res) => {
     res.status(200).json({ message: "You logged in!", token: jwtToken});
 });
 
+router.get('/decode-jwt', (req, res) => {
+    const authHeader = req.headers.authorization;
+    const splitedStr = authHeader.split(' ');
+    const token = splitedStr[1];
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+        if (err) {
+            return res.status(500).json({ message: "Cannot decode JWT" });
+        } else {
+            const { id } = decodedToken;
+
+            // Retrieve additional user information from the database based on the id
+            User.findOne({ where: { id } })
+                .then(user => {
+                    if (!user) {
+                        return res.status(404).json({ message: "User not found" });
+                    }
+
+                    // Combine the additional user information with the decoded token
+                    const userWithInfo = {
+                        id: user.id,
+                        role_id: user.role_id,
+                        name: user.name,
+                        email: user.email,
+                    };
+
+                    return res.status(200).json({ user: userWithInfo });
+                })
+                .catch(error => {
+                    console.error("Error retrieving user", error);
+                    return res.status(500).json({ message: "Failed to retrieve user" });
+                });
+        }
+    });
+});
+
 module.exports = router;

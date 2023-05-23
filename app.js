@@ -48,7 +48,7 @@ const swaggerOptions = {
     ],
     servers: [
         {
-            url: 'http://localhost:3000',
+            url: 'http://localhost:8080',
             description: 'Development server'
         },
         {
@@ -99,6 +99,7 @@ const openAiLogsRouter = require('./routes/openAiLogsRouter');
 app.use("/api/v1/openailogs", openAiLogsRouter);
 
 app.use("/api/v1", api);
+
 app.use('/api/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(express.json());
