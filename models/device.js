@@ -13,11 +13,7 @@ const Device = sequelize.define('Device', {
     },
     user_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'users',
-            key: 'id'
-        }
+        allowNull: true,
     },
     name: {
         type: DataTypes.STRING,
@@ -26,6 +22,10 @@ const Device = sequelize.define('Device', {
     type: {
         type: DataTypes.ENUM('1', '2'),
         allowNull: false,
+    },
+    mpn: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     created_at: {
         type: DataTypes.DATE,
@@ -39,10 +39,12 @@ const Device = sequelize.define('Device', {
     timestamps: true,
     underscored: true,
     tableName: 'devices',
+    indexes: [
+        { fields: ['user_id'], name: 'user_id_index', using: "BTREE" }
+    ]
 });
 
 Device.associate = function(models) {
-    Device.belongsTo(models.User, {foreignKey: 'user_id', onDelete: 'CASCADE'});
     Device.hasMany(models.DeviceSettings, {foreignKey: 'device_id', onDelete: 'CASCADE'});
     Device.hasMany(models.Temperature, { foreignKey: 'device_id', onDelete: 'CASCADE' });
     Device.hasMany(models.Humidity, { foreignKey: 'device_id', onDelete: 'CASCADE' });

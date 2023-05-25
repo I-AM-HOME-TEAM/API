@@ -8,11 +8,10 @@ require("./auth/passport");
 
 require('./models/user');
 
-const middlewares = require('./middlewares');
 const api = require ('./api');
 const app = express();
 
-const whitelist = ["http://localhost:3000"]
+const whitelist = ["http://localhost:8080"]
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || whitelist.indexOf(origin) !== -1) {

@@ -67,7 +67,6 @@ User.associate = function(models) {
     User.hasMany(models.DeviceSettings, { foreignKey: 'user_id', onDelete: 'CASCADE' });
     User.belongsTo(models.Roles, { foreignKey: 'role_id', onDelete: 'CASCADE' });
     User.hasMany(models.IpAddresses, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-    User.hasMany(models.Device, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 };
 
 module.exports = User;

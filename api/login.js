@@ -3,6 +3,8 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+const jwtExpiration = 15 * 24 * 60 * 60; // 15 days in seconds
+
 const router = express.Router();
 
 // Authorization endpoint
@@ -11,10 +13,16 @@ router.post("/login", async (req, res) => {
 
     try {
         // Check if email already exists
-        const userWithEmail = await User.findOne({ where: { email } });
+        const userWithEmail = await User.findOne({
+            where: { email },
+        });
 
         if (!userWithEmail) {
             return res.status(400).json({ message: "Email or password does not match..." });
+        }
+
+        if (!userWithEmail.is_verified) {
+            return res.status(400).json({ message: "Please verify your email before logging in" });
         }
 
         // Compare passwords using bcrypt
@@ -30,7 +38,8 @@ router.post("/login", async (req, res) => {
                 id: userWithEmail.id,
                 email: userWithEmail.email,
             },
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+            { expiresIn: jwtExpiration }
         );
 
         res.status(200).json({ message: "You logged in!", token: jwtToken });
