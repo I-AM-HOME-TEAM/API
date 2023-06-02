@@ -163,6 +163,19 @@ devicesRouter.post('/add-device-by-mpn', authenticateToken, (req, res) => {
         });
 });
 
+devicesRouter.get('/get-devices-by-user-id', authenticateToken, (req, res) => {
+    const user_id = req.user.id;
+
+    Device.findAll({ where: { user_id } })
+        .then(async device => {
+            if (!device) {
+                return res.status(404).json({ message: "You don't have any devices" });
+            }
+
+            return res.status(200).json({ device });
+        })
+});
+
 devicesRouter.post('/add', devicesController.addDevice);
 
 devicesRouter.get('/getAll', devicesController.getAllDevices);
