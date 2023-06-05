@@ -32,7 +32,7 @@ const User = sequelize.define('User', {
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: true
             },
             restoration_token: {
                 type: DataTypes.STRING,
@@ -53,8 +53,17 @@ const User = sequelize.define('User', {
             is_verified: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
-            }
-        }, {
+            },
+            google_id: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                unique: true,
+            },
+            google_token: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+    }, {
             timestamps: true,
             underscored: true,
             tableName: 'users',
