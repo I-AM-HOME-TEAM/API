@@ -1,18 +1,29 @@
 const bodyParser = require("body-parser");
 const express = require("express");
+const session = require("express-session");
 const cors = require("cors")
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 require("dotenv").config();
-require("./auth/passport");
+
 
 require('./models/user');
 
-const middlewares = require('./middlewares');
 const api = require ('./api');
-const app = express();
 
-const whitelist = ["http://localhost:3000"]
+const isLoggedIn = (req, res, next) => {
+    req.user ? next() : res.sendStatus(401);
+}
+
+const app = express();
+app.use(session({ secret: process.env.SESSION_SECRET }));
+const passport = require("passport");
+require("./auth/passport");
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+const whitelist = ["http://localhost:8080"]
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || whitelist.indexOf(origin) !== -1) {
@@ -96,21 +107,30 @@ const notificationRouter = require('./routes/notificationRouter');
 app.use("/api/v1/notification", notificationRouter);
 
 const openAiLogsRouter = require('./routes/openAiLogsRouter');
+
 app.use("/api/v1/openailogs", openAiLogsRouter);
 
 app.use("/api/v1", api);
 
 app.use('/api/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use(express.json());
-
-app.get("/", (req, res) => {
-    res.json({
-        message: "App.js"
-    });
+app.use('/api/v1/google-test', (req, res) => {
+    res.send('<a href="/api/v1/google">Authenticate with Google</a>')
 });
 
-// app.use(middlewares.notFound);
-// app.use(middlewares.errorHandler);
+app.get('/api/v1/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+app.get('/api/v1/google/callback',
+    passport.authenticate('google', {
+      successRedirect: '/',
+      failureRedirect: '/api/v1/register'
+    })
+)
+
+app.use(express.json());
+
+app.get('/', isLoggedIn, (req, res) => {
+    res.send('Hello!')
+});
 
 module.exports = app;

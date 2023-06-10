@@ -32,7 +32,7 @@ const User = sequelize.define('User', {
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: true
             },
             restoration_token: {
                 type: DataTypes.STRING,
@@ -46,7 +46,24 @@ const User = sequelize.define('User', {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
-        }, {
+            verification_token: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            is_verified: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
+            google_id: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                unique: true,
+            },
+            google_token: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+    }, {
             timestamps: true,
             underscored: true,
             tableName: 'users',
@@ -59,7 +76,6 @@ User.associate = function(models) {
     User.hasMany(models.DeviceSettings, { foreignKey: 'user_id', onDelete: 'CASCADE' });
     User.belongsTo(models.Roles, { foreignKey: 'role_id', onDelete: 'CASCADE' });
     User.hasMany(models.IpAddresses, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-    User.hasMany(models.Device, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 };
 
 module.exports = User;

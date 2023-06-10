@@ -5,9 +5,9 @@ const Devices = db.devices;
 const addDevice = async (req, res) => {
 
     let info = {
-        user_id: req.body.user_id,
         name: req.body.name,
-        type: req.body.type
+        type: req.body.type,
+        mpn: req.body.mpn
     }
     console.log(info);
 

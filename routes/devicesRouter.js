@@ -18,15 +18,15 @@
  *           schema:
  *             type: object
  *             properties:
- *               user_id:
- *                 type: integer
- *                 description: The ID of the user who owns the device
  *               name:
  *                 type: string
  *                 description: The name of the device
  *               type:
  *                 type: string
  *                 description: The type of the device
+ *               mpn:
+ *                  type: string
+ *                  description: Device MPN
  *     responses:
  *       201:
  *         description: Device created successfully
@@ -87,15 +87,15 @@
  *           schema:
  *             type: object
  *             properties:
- *               user_id:
- *                 type: integer
- *                 description: The ID of the user who owns the device
  *               name:
  *                 type: string
  *                 description: The name of the device
  *               type:
  *                 type: string
  *                 description: The type of the device
+ *               mpn:
+ *                  type: string
+ *                  description: Device MPN
  *     responses:
  *       200:
  *         description: Device updated successfully
@@ -128,6 +128,53 @@
 const devicesController = require('../controllers/devicesController');
 
 const devicesRouter = require('express').Router();
+
+const authenticateToken = require('../middlewares/authenticateToken');
+
+const Device = require('../models/device');
+
+devicesRouter.post('/add-device-by-mpn', authenticateToken, (req, res) => {
+    const { mpn } = req.body;
+    const userId = req.user.id;
+
+    // Check if a device with the provided MPN exists
+    Device.findOne({ where: { mpn } })
+        .then(async device => {
+            if (!device) {
+                return res.status(404).json({ message: 'Device not found' });
+            }
+
+            if (device.user_id === userId) {
+                return res.status(400).json({ message: 'You already have this device' });
+            }
+
+            // Assign the device to the authenticated user
+            device.user_id = userId;
+            await device.save();
+
+            // Return the updated device with the user_id assigned
+            const { id, name, type, user_id } = device;
+            const updatedDevice = { id, user_id, name, type };
+            return res.status(200).json({ device: updatedDevice });
+        })
+        .catch(err => {
+            console.error(err);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        });
+});
+
+devicesRouter.get('/get-devices-by-user-id', authenticateToken, (req, res) => {
+    const user_id = req.user.id;
+
+    Device.findAll({ where: { user_id } })
+        .then(async device => {
+            if (!device) {
+                return res.status(404).json({ message: "You don't have any devices" });
+            }
+
+            return res.status(200).json({ device });
+        })
+});
 
 devicesRouter.post('/add', devicesController.addDevice);
 

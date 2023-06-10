@@ -11,10 +11,16 @@ router.post("/login", async (req, res) => {
 
     try {
         // Check if email already exists
-        const userWithEmail = await User.findOne({ where: { email } });
+        const userWithEmail = await User.findOne({
+            where: { email },
+        });
 
         if (!userWithEmail) {
             return res.status(400).json({ message: "Email or password does not match..." });
+        }
+
+        if (!userWithEmail.is_verified) {
+            return res.status(400).json({ message: "Please verify your email before logging in" });
         }
 
         // Compare passwords using bcrypt
@@ -30,7 +36,8 @@ router.post("/login", async (req, res) => {
                 id: userWithEmail.id,
                 email: userWithEmail.email,
             },
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXP_VALUE }
         );
 
         res.status(200).json({ message: "You logged in!", token: jwtToken });
