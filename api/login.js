@@ -3,8 +3,6 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const jwtExpiration = 15 * 24 * 60 * 60; // 15 days in seconds
-
 const router = express.Router();
 
 // Authorization endpoint
@@ -39,7 +37,7 @@ router.post("/login", async (req, res) => {
                 email: userWithEmail.email,
             },
             process.env.JWT_SECRET,
-            { expiresIn: jwtExpiration }
+            { expiresIn: process.env.JWT_EXP_VALUE }
         );
 
         res.status(200).json({ message: "You logged in!", token: jwtToken });

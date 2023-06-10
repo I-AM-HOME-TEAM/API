@@ -11,7 +11,7 @@ require('./models/user');
 
 const api = require ('./api');
 
-function isLoggedIn(req, res, next) {
+const isLoggedIn = (req, res, next) => {
     req.user ? next() : res.sendStatus(401);
 }
 
@@ -132,8 +132,5 @@ app.use(express.json());
 app.get('/', isLoggedIn, (req, res) => {
     res.send('Hello!')
 });
-
-// app.use(middlewares.notFound);
-// app.use(middlewares.errorHandler);
 
 module.exports = app;
