@@ -118,7 +118,7 @@ app.use('/api/v1/google-test', (req, res) => {
     res.send('<a href="/api/v1/google">Authenticate with Google</a>')
 });
 
-app.get('/api/v1/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+app.post('/api/v1/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 app.get('/api/v1/google/callback',
     passport.authenticate('google', {
