@@ -23,6 +23,20 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Please verify your email before logging in" });
         }
 
+        if (userWithEmail.google_id) {
+            // Handle the login flow for Google users
+            const jwtToken = jwt.sign(
+                {
+                    id: userWithEmail.id,
+                    email: userWithEmail.email,
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: process.env.JWT_EXP_VALUE }
+            );
+
+            return res.status(200).json({ message: "You logged in!", token: jwtToken });
+        }
+
         // Compare passwords using bcrypt
         const isPasswordMatch = await bcrypt.compare(password, userWithEmail.password);
 
