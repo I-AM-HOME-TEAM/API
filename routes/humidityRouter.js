@@ -120,8 +120,67 @@
  */
 
 const humidityController = require('../controllers/humidityController');
-
+const {body} = require("express-validator");
+const authenticateToken = require("../middlewares/authenticateToken");
+const Device = require("../models/device");
+const sequelize = require("../database");
 const humidityRouter = require('express').Router();
+
+humidityRouter.post('/humidity-statistics', [
+    // Validation middleware for request body
+    body('delay').isInt().toInt(),
+], authenticateToken, async (req, res) => {
+    try {
+        const { delay } = req.body;
+        const { id: userId } = req.user;
+
+        const device = await Device.findOne({ where: { user_id: userId } });
+        if (!device) {
+            return res.status(404).json({ message: 'Device not found' });
+        }
+
+        const { id: deviceId } = device;
+
+        const now = new Date();
+        const startTime = new Date(now.getTime() - delay * 60000);
+
+        const query = 'SELECT * FROM humidities WHERE device_id = :deviceId AND created_at >= :startTime AND created_at <= :endTime ORDER BY created_at ASC';
+
+        const humidityData = await sequelize.query(query, {
+            replacements: {
+                deviceId,
+                startTime,
+                endTime: now,
+            },
+            type: sequelize.QueryTypes.SELECT,
+        });
+
+        const calculateAverageHumidity = (humidityData) => {
+            if (humidityData.length === 0) {
+                return '0';
+            }
+
+            const sum = humidityData.reduce((total, { humidity }) => total + humidity, 0);
+            const average = sum / humidityData.length;
+            const roundedAverage = average.toFixed(0);
+            return roundedAverage;
+        };
+
+        const averageHumidity = calculateAverageHumidity(humidityData);
+
+        const statistics = {
+            temperature: humidityData,
+            averageHumidity,
+        };
+
+        res.status(200).json(statistics);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'An error occurred while fetching temperature statistics' });
+    }
+});
+
+
 
 humidityRouter.post('/add', humidityController.addHumidity);
 
