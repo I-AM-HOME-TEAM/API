@@ -5,15 +5,12 @@ const Temperature = db.temperatures;
 const addTemperature = async (req, res) => {
 
     let info = {
-        device_id: req.body.device_id,
-        temperature: req.body.temperature,
+        mpn: req.body.mpn,
+        temperature: req.body.value,
     }
 
     const temperature = await Temperature.create(info);
-
     res.status(200).send(temperature);
-
-    console.log(temperature);
 }
 
 // Get all temperatures from table

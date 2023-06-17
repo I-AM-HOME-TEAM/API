@@ -5,14 +5,12 @@ const Humidity = db.humidities;
 const addHumidity = async (req, res) => {
 
     let info = {
-        device_id: req.body.device_id,
-        humidity: req.body.humidity,
+        mpn: req.body.mpn,
+        value: req.body.value,
     }
 
     const humidity = await Humidity.create(info);
-
     res.status(200).send(humidity);
-
     console.log(humidity);
 }
 

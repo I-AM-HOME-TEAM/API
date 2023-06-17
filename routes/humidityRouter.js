@@ -169,7 +169,7 @@ humidityRouter.post('/humidity-statistics', [
         const averageHumidity = calculateAverageHumidity(humidityData);
 
         const statistics = {
-            temperature: humidityData,
+            humidity: humidityData,
             averageHumidity,
         };
 
